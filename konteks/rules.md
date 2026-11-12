@@ -44,7 +44,7 @@ Keputusan stack proyek (selaras ketentuan lomba — lihat
 | Database        | MySQL 8.4 + Prisma ORM (database: `sedek_aget`)               |
 | Background job  | Redis + BullMQ                                                |
 | Pembayaran      | Midtrans Snap                                                 |
-| Peta            | Leaflet + OpenStreetMap                                       |
+| Peta            | Google Maps JavaScript API                                    |
 | Grafik          | Chart.js                                                     |
 | Deployment      | Docker + Nginx                                                |
 

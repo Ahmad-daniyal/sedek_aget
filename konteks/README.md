@@ -18,7 +18,7 @@ layanan. Pendaftaran usaha diverifikasi secara inklusif berbasis bukti
 ## Fitur Utama
 
 - Marketplace produk & jasa multi-vendor UMKM.
-- Direktori & peta UMKM lokal (Leaflet + OpenStreetMap).
+- Direktori & peta UMKM lokal (Google Maps JavaScript API).
 - Pre-order / pesanan khusus dan booking layanan (pickup / delivery).
 - Pembayaran online (Midtrans Snap) dan pembayaran langsung di toko.
 - AI-Powered UMKM Verification — inklusif, berbasis bukti usaha.
@@ -34,7 +34,7 @@ layanan. Pendaftaran usaha diverifikasi secara inklusif berbasis bukti
 | Database       | MySQL 8.4 + Prisma ORM                                  |
 | Background job | Redis + BullMQ                                          |
 | Pembayaran     | Midtrans Snap                                           |
-| Peta           | Leaflet + OpenStreetMap                                 |
+| Peta           | Google Maps JavaScript API                                 |
 | Grafik         | Chart.js                                                |
 | Deployment     | Docker + Nginx                                         |
 
@@ -93,6 +93,12 @@ npm run dev
 - `Guidebook_CleanCode_informindfest.pdf` — panduan resmi lomba.
 
 ## Catatan Perubahan
+
+### 12 November 2026
+
+- Mengganti peta dari Leaflet + OpenStreetMap ke **Google Maps JavaScript
+  API** dengan library `@vis.gl/react-google-maps` pada frontend.
+- Menambahkan `VITE_GOOGLE_MAPS_API_KEY` pada environment frontend.
 
 ### 11 November 2026
 
