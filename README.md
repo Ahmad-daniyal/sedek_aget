@@ -105,6 +105,8 @@ npm run prisma:seed
 npm run dev
 ```
 
+prankkk
+
 API berjalan di `http://localhost:5000`. Cek kesehatan:
 
 ```bash
