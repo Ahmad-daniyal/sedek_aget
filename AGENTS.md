@@ -45,7 +45,7 @@ tim:
 - **Backend:** Node.js + Express.js, JavaScript (`.js`).
 - **Database:** MySQL 8.4 + Prisma ORM (nama database: `sedek_aget`).
 - **Background job:** Redis + BullMQ.
-- **Integrasi:** Midtrans Snap, Leaflet + OpenStreetMap, Chart.js.
+- **Integrasi:** Midtrans Snap, Google Maps JavaScript API, Chart.js.
 - **Deployment:** Docker + Nginx.
 - **Dilarang:** TypeScript, Next.js, Laravel, Blade, Tailwind CSS.
 - Penamaan teknis konsisten memakai `sedek_aget` (repo, folder root, database).

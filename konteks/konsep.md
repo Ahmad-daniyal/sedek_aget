@@ -84,7 +84,7 @@ Berikut teknologi yang sudah disepakati sebagai stack utama proyek.
 ### Integrasi eksternal
 
 - **Midtrans Snap** — pembayaran online.
-- **Leaflet + OpenStreetMap** — peta dan lokasi UMKM.
+- **Google Maps JavaScript API** — peta dan lokasi UMKM.
 - **Chart.js** — grafik dan laporan.
 - **Docker + Nginx** — deployment dan server.
 
@@ -377,7 +377,7 @@ Fitur:
 - Informasi jam operasional.
 - Area operasional usaha bergerak.
 
-Teknologi yang dipakai adalah Leaflet + OpenStreetMap.
+Teknologi yang dipakai adalah Google Maps JavaScript API.
 
 Data lokasi disimpan dalam latitude dan longitude.
 
@@ -995,7 +995,7 @@ tanpa alasan.
 | Booking              | Didukung                                      |
 | Pembayaran           | Midtrans dan pembayaran langsung             |
 | MVP checkout         | Satu toko per checkout                        |
-| Peta                 | Leaflet + OpenStreetMap                       |
+| Peta                 | Google Maps JavaScript API                       |
 | Frontend             | React + Vite + JavaScript                     |
 | Backend              | Node.js + Express + JavaScript                |
 | Database             | MySQL 8.4 + Prisma                            |

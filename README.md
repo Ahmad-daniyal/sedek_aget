@@ -35,7 +35,7 @@ keranjang & checkout, pre-order, booking layanan, Midtrans, verifikasi AI
 | Backend         | Node.js + Express.js (JavaScript `.js`)               |
 | Database        | MySQL 8.4 + Prisma ORM (database: `sedek_aget`)       |
 | Background job  | Redis + BullMQ (disiapkan untuk tahap berikutnya)     |
-| Peta            | Leaflet + OpenStreetMap                               |
+| Peta            | Google Maps JavaScript API + @vis.gl/react-google-maps |
 | Deployment      | Docker + Nginx (tahap akhir)                          |
 
 Tidak menggunakan TypeScript, Next.js, Laravel, Blade, maupun Tailwind CSS.
@@ -74,6 +74,7 @@ sedek_aget/
 - MySQL 8.4 (atau jalankan lewat Docker Compose)
 - Docker + Docker Compose (opsional, untuk database & Redis lokal)
 - Redis (opsional untuk base web; dibutuhkan saat background job ditambahkan)
+- Google Maps API key dengan **Maps JavaScript API** aktif (untuk fitur peta)
 
 ## Menjalankan proyek
 
@@ -116,10 +117,12 @@ curl http://localhost:5000/api/health
 cd frontend
 npm install
 cp .env.example .env
+# isi VITE_GOOGLE_MAPS_API_KEY dengan API key Maps JavaScript API
 npm run dev
 ```
 
-Frontend berjalan di `http://localhost:5173`.
+Frontend berjalan di `http://localhost:5173`. Batasi API key dengan HTTP
+referrer `http://localhost:5173/*` (dan domain produksi nanti) agar aman.
 
 ## Akun demo (hasil seed)
 
@@ -173,3 +176,12 @@ Query opsional untuk `/api/stores`: `?search=` dan `?category=`.
   code, keamanan.
 - [`konteks/STRUKTUR_CODE.md`](./konteks/STRUKTUR_CODE.md) — referensi
   struktur & konvensi kode.
+
+## Catatan perubahan
+
+### 12 November 2026
+
+- Mengganti peta dari Leaflet + OpenStreetMap ke **Google Maps JavaScript
+  API** dengan library `@vis.gl/react-google-maps`.
+- Menambahkan `VITE_GOOGLE_MAPS_API_KEY` pada konfigurasi environment
+  frontend; peta menampilkan pesan fallback jika key belum diisi.
