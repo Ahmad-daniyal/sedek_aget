@@ -1,5 +1,7 @@
 # sedek_aget
 
+
+
 Marketplace digital UMKM lokal — menghubungkan masyarakat dengan pedagang,
 warung, usaha rumahan, hingga penyedia jasa di sekitarnya. Proyek untuk
 **Lomba Clean Code Web Programming — INFORMIND FEST VOL. II**, subtema
