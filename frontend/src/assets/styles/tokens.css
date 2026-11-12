@@ -1,0 +1,45 @@
+:root {
+  --brand-50: #ecfdf5;
+  --brand-100: #d1fae5;
+  --brand-200: #a7f3d0;
+  --brand-500: #10b981;
+  --brand-600: #059669;
+  --brand-700: #047857;
+  --brand-800: #065f46;
+
+  --ink-900: #1c1917;
+  --ink-700: #44403c;
+  --ink-500: #78716c;
+  --ink-400: #a8a29e;
+  --ink-300: #d6d3d1;
+
+  --surface: #fafaf9;
+  --surface-raised: #ffffff;
+  --surface-muted: #f5f5f4;
+  --border: #e7e5e4;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(28, 25, 23, 0.06);
+  --shadow-sm: 0 4px 16px -8px rgba(28, 25, 23, 0.16);
+  --shadow-md: 0 20px 48px -24px rgba(28, 25, 23, 0.28);
+  --shadow-brand: 0 16px 32px -16px rgba(5, 150, 105, 0.45);
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --container: 1180px;
+
+  --bs-body-font-family: var(--font-sans);
+  --bs-body-color: var(--ink-900);
+  --bs-body-bg: var(--surface);
+  --bs-border-color: var(--border);
+  --bs-primary: #059669;
+  --bs-primary-rgb: 5, 150, 105;
+  --bs-link-color: #047857;
+  --bs-link-hover-color: #065f46;
+  --bs-border-radius: 14px;
+  --bs-border-radius-lg: 18px;
+  --bs-focus-ring-color: rgba(16, 185, 129, 0.25);
+}

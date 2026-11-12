@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum StoreStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(80)
+  email        String   @unique @db.VarChar(120)
+  phone        String?  @db.VarChar(20)
+  passwordHash String   @db.VarChar(255)
+  role         Role     @default(CUSTOMER)
+  avatarUrl    String?  @db.VarChar(255)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  stores       Store[]
+
+  @@map("users")
+}
+
+model Store {
+  id                Int                     @id @default(autoincrement())
+  ownerId           Int
+  name              String                  @db.VarChar(120)
+  slug              String                  @unique @db.VarChar(140)
+  description       String?                 @db.Text
+  logoUrl           String?                 @db.VarChar(255)
+  bannerUrl         String?                 @db.VarChar(255)
+  status            StoreStatus             @default(PENDING)
+  verificationScore Int?
+  riskScore         Int?
+  phone             String?                 @db.VarChar(20)
+  address           String?                 @db.VarChar(255)
+  latitude          Float?
+  longitude         Float?
+  rating            Float                   @default(0)
+  reviewCount       Int                     @default(0)
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  owner             User                    @relation(fields: [ownerId], references: [id])
+  categories        StoreBusinessCategory[]
+  products          Product[]
+  location          StoreLocation?
+
+  @@index([status])
+  @@map("stores")
+}
+
+model StoreLocation {
+  id        Int    @id @default(autoincrement())
+  storeId   Int    @unique
+  address   String @db.VarChar(255)
+  latitude  Float
+  longitude Float
+  store     Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@map("store_locations")
+}
+
+model BusinessCategory {
+  id     Int                     @id @default(autoincrement())
+  name   String                  @db.VarChar(80)
+  slug   String                  @unique @db.VarChar(100)
+  icon   String?                 @db.VarChar(60)
+  stores StoreBusinessCategory[]
+
+  @@map("business_categories")
+}
+
+model StoreBusinessCategory {
+  storeId    Int
+  categoryId Int
+  store      Store            @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category   BusinessCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([storeId, categoryId])
+  @@map("store_business_categories")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  storeId     Int
+  name        String   @db.VarChar(120)
+  slug        String   @db.VarChar(140)
+  description String?  @db.Text
+  price       Int
+  stock       Int      @default(0)
+  imageUrl    String?  @db.VarChar(255)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, slug])
+  @@map("products")
+}

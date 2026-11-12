@@ -43,24 +43,23 @@ maupun Tailwind CSS. Selengkapnya di [rules.md](./rules.md).
 
 ## Struktur Proyek
 
-Struktur target (monorepo — detail lengkap di
-[docs/konsep.md](./docs/konsep.md)):
+Struktur monorepo (detail lengkap di
+[konteks/konsep.md](./konsep.md)):
 
 ```
 sedek_aget/
 ├── frontend/            # React + Vite (.jsx)
 ├── backend/             # Express + Prisma (.js)
-├── docs/
-│   └── konsep.md        # Dokumen konsep & arsitektur
+├── konteks/             # Dokumen acuan proyek & aturan AI
+│   ├── README.md
+│   ├── konsep.md
+│   ├── rules.md
+│   └── STRUKTUR_CODE.md
 ├── .github/workflows/   # CI: lint + build check (syarat lomba)
-├── docker-compose.yml
-├── Guidebook_CleanCode_informindfest.pdf
-├── rules.md
+├── docker-compose.yml   # MySQL 8.4 + Redis untuk development
+├── AGENTS.md            # Instruksi wajib untuk agen AI
 └── README.md
 ```
-
-> **TODO:** Struktur di atas adalah target; kode frontend/backend akan
-> ditambahkan sesuai roadmap di `docs/konsep.md` (bagian 17).
 
 ## Cara Menjalankan Proyek
 
@@ -83,15 +82,14 @@ cp .env.example .env    # isi kredensial: database, Redis, Midtrans, API AI
 npm run dev
 ```
 
-> **TODO:** Perintah di atas berlaku setelah struktur monorepo dibuat.
-> Saat ini repositori masih berisi dokumentasi (rules, konsep) — kode akan
-> ditambahkan bertahap sesuai roadmap.
+> Gunakan `docker compose up -d mysql redis` untuk menjalankan database dan
+> Redis development. Detail lengkap ada di `README.md` root.
 
 ## Dokumentasi
 
 - [rules.md](./rules.md) — aturan pengembangan clean code & ketentuan lomba.
-- [docs/konsep.md](./docs/konsep.md) — konsep, arsitektur, database, dan
-  sistem verifikasi.
+- [konsep.md](./konsep.md) — konsep, arsitektur, database, dan sistem
+  verifikasi.
 - `Guidebook_CleanCode_informindfest.pdf` — panduan resmi lomba.
 
 ## Catatan Perubahan
@@ -105,7 +103,7 @@ npm run dev
 - Melengkapi `README.md` — menambahkan deskripsi proyek, cara menjalankan,
   tech stack, struktur proyek, dan tautan aturan pengembangan (sesuai
   ketentuan guidebook bahwa README wajib memuat cara menjalankan proyek).
-- Menambahkan `docs/konsep.md` — dokumen konsep lengkap marketplace digital
+- Menambahkan `konteks/konsep.md` — dokumen konsep lengkap marketplace digital
   UMKM (arsitektur, fitur, proses bisnis, database, sistem verifikasi AI,
   roadmap, dan batasan MVP untuk lomba), dengan penamaan diseragamkan ke
   `sedek_aget` (nama produk final menyusul).
@@ -117,4 +115,4 @@ npm run dev
   diperluas.
 - Memperbarui `README.md` — mendeklarasikan subtema **EKRAF**, deskripsi
   marketplace digital UMKM, fitur utama, tech stack nyata, struktur target
-  monorepo, cara menjalankan, dan tautan `docs/konsep.md`.
+  monorepo, cara menjalankan, dan tautan `konteks/konsep.md`.

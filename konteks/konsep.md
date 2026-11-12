@@ -862,12 +862,16 @@ sedek_aget/
 │   ├── .env
 │   └── package.json
 │
-├── docs/
-│   └── konsep.md
+├── konteks/
+│   ├── README.md
+│   ├── konsep.md
+│   ├── rules.md
+│   └── STRUKTUR_CODE.md
 │
 ├── .github/workflows/   # CI: lint + build check (syarat System Automated lomba)
 │
 ├── docker-compose.yml
+├── AGENTS.md
 └── README.md
 ```
 

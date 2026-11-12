@@ -2,7 +2,7 @@
 
 Aturan pengembangan proyek **sedek_aget** yang diturunkan dari
 *Guidebook Lomba Clean Code Web Programming — INFORMIND FEST VOL. II*
-dan dokumen konsep [docs/konsep.md](./docs/konsep.md).
+dan dokumen konsep [konsep.md](./konsep.md).
 
 Semua kontributor wajib membaca dan mematuhi dokumen ini sebelum menulis kode.
 
@@ -34,7 +34,7 @@ Semua kontributor wajib membaca dan mematuhi dokumen ini sebelum menulis kode.
 ## 3. Stack Final Proyek sedek_aget
 
 Keputusan stack proyek (selaras ketentuan lomba — lihat
-[docs/konsep.md](./docs/konsep.md)):
+[konsep.md](./konsep.md)):
 
 | Layer           | Teknologi                                                    |
 | --------------- | ------------------------------------------------------------ |
@@ -61,7 +61,7 @@ Aturan tambahan:
 ## 4. Standar Clean Code & Arsitektur (bobot penilaian 35%)
 
 1. **Kerapihan struktur folder**
-   - Ikuti struktur monorepo di `docs/konsep.md` (bagian 15): `frontend/` dan
+   - Ikuti struktur monorepo di `konteks/konsep.md` (bagian 15): `frontend/` dan
      `backend/` terpisah, modul backend per domain (`modules/auth`,
      `modules/stores`, dst.).
    - Konsisten di seluruh proyek; jangan mencampur kode frontend dan backend.
@@ -124,7 +124,7 @@ Aturan tambahan:
 
 ## 8. Integrasi & Keamanan Proyek
 
-Prinsip tetap dari konsep (docs/konsep.md bagian 16):
+Prinsip tetap dari konsep (konteks/konsep.md bagian 16):
 
 1. Password pengguna harus di-hash.
 2. Autentikasi memakai session/JWT dengan cookie `HttpOnly` yang aman.
@@ -150,7 +150,7 @@ Prinsip tetap dari konsep (docs/konsep.md bagian 16):
    agar demo tetap berjalan saat layanan gagal atau tidak tersedia.
 3. Sebelum submit: CI lint+build hijau, ESLint zero error, semua alur utama
    teruji ulang end-to-end.
-4. Sesuaikan roadmap 9 tahap (docs/konsep.md bagian 17) dengan jadwal lomba —
+4. Sesuaikan roadmap 9 tahap (konteks/konsep.md bagian 17) dengan jadwal lomba —
    batas pengumpulan H-1 Review pukul 23:59.
 
 ## 10. Larangan & Diskualifikasi
