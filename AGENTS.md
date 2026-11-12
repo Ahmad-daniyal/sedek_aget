@@ -85,5 +85,26 @@ tim:
 - [ ] Lint dan build lolos.
 - [ ] Keamanan dijaga (harga dihitung backend, hak akses dicek backend,
       secret tidak terekspos).
+- [ ] Dokumentasi dan `konteks/` sinkron dengan perubahan.
 
-> Ringkasnya: **baca `konteks/` dulu, baru kerjakan.**
+---
+
+## 7. Sinkronisasi konteks (wajib)
+
+Setiap perubahan kode, stack, struktur folder, API, fitur, atau proses bisnis
+wajib dianalisis dampaknya terhadap folder `konteks/`.
+
+1. Periksa apakah perubahan memengaruhi `konteks/README.md`,
+   `konteks/konsep.md`, `konteks/rules.md`, atau
+   `konteks/STRUKTUR_CODE.md`.
+2. Perbarui dokumen konteks yang terdampak pada commit yang sama dengan
+   perubahan kode.
+3. Perbarui juga `README.md` dan `AGENTS.md` bila stack, cara menjalankan,
+   struktur, atau aturan berubah.
+4. Jika tidak ada perubahan konteks yang diperlukan, catat alasan singkat di
+   catatan perubahan.
+5. Jangan menyelesaikan tugas bila dokumentasi/konteks belum sinkron dengan
+   perubahan, kecuali perubahan murni internal tanpa dampak.
+
+> Ringkasnya: **baca `konteks/` dulu, baru kerjakan; setiap perubahan
+> wajib menjaga `konteks/` tetap sinkron.**
