@@ -195,7 +195,7 @@ Admin mengelola keseluruhan platform:
 - Aktivitas dan keamanan.
 
 ### Konsep database peran
-
+   
 `users.role` cukup membedakan `admin` dan `customer`. Status penjual
 ditentukan dari toko atau pengajuan usaha yang sudah disetujui, bukan dengan
 mengubah akun menjadi role penjual yang menghilangkan kemampuan pembeli.
