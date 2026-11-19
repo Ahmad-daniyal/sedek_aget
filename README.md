@@ -1,7 +1,5 @@
 # sedek_aget
 
-
-
 Marketplace digital UMKM lokal — menghubungkan masyarakat dengan pedagang,
 warung, usaha rumahan, hingga penyedia jasa di sekitarnya. Proyek untuk
 **Lomba Clean Code Web Programming — INFORMIND FEST VOL. II**, subtema
@@ -17,34 +15,41 @@ Base web fullstack sudah tersedia:
 
 - **Frontend** — React + Vite dengan desain modern minimalis emerald: landing
   page, jelajah UMKM, peta UMKM, halaman masuk & daftar, responsif.
-- **Backend** — REST API Express dengan Prisma: autentikasi JWT (cookie
-  `HttpOnly`), daftar UMKM & kategori, seed data contoh.
+- **Backend** — REST API Laravel 13 + Eloquent: autentikasi Sanctum SPA cookie
+  (`HttpOnly` + CSRF), daftar UMKM & kategori, seed data contoh, dan fondasi
+  queue Redis.
 - **Fallback data** — halaman tetap tampil dengan data contoh saat API belum
   berjalan.
 
 Fitur bertahap berikutnya (sesuai roadmap): dashboard pembeli/penjual/admin,
-keranjang & checkout, pre-order, booking layanan, Midtrans, verifikasi AI
-(BullMQ), dan laporan Chart.js.
+keranjang & checkout, pre-order, booking layanan, webhook Midtrans, pipeline AI
+verifikasi penuh, dan laporan Chart.js. Fitur-fitur ini **belum** diimplementasikan
+— lihat `konteks/konsep.md` untuk rencananya.
 
 ## Tech stack
 
-| Layer           | Teknologi                                             |
-| --------------- | ----------------------------------------------------- |
-| Frontend        | React.js + Vite (JavaScript `.jsx`)                   |
-| UI              | Bootstrap 5.3 + Custom CSS, Bootstrap Icons, AOS      |
-| Backend         | Node.js + Express.js (JavaScript `.js`)               |
-| Database        | MySQL 8.4 + Prisma ORM (database: `sedek_aget`)       |
-| Background job  | Redis + BullMQ (disiapkan untuk tahap berikutnya)     |
-| Peta            | Google Maps JavaScript API + @vis.gl/react-google-maps |
-| Deployment      | Docker + Nginx (tahap akhir)                          |
+| Layer           | Teknologi                                               |
+| --------------- | ------------------------------------------------------- |
+| Frontend        | React.js + Vite (JavaScript `.jsx`)                     |
+| UI              | Bootstrap 5.3 + Custom CSS, Bootstrap Icons, AOS        |
+| Backend         | Laravel 13 + PHP 8.3+ (REST API)                        |
+| ORM             | Eloquent (MySQL 8.4, database `sedek_aget`)             |
+| Autentikasi     | Laravel Sanctum — SPA cookie + CSRF                     |
+| Background job  | Laravel Queue + Redis (`predis/predis`)                 |
+| Pembayaran      | Midtrans Snap (konfigurasi placeholder, belum terhubung)|
+| Peta            | Google Maps JavaScript API + @vis.gl/react-google-maps  |
+| Grafik          | Chart.js (rencana)                                      |
+| Deployment      | Docker + Nginx (tahap akhir)                            |
 
-Tidak menggunakan TypeScript, Next.js, Laravel, Blade, maupun Tailwind CSS.
+Tidak menggunakan Express.js, Node.js sebagai backend, TypeScript, Next.js,
+Vue, Nuxt, CodeIgniter, maupun Tailwind CSS. Blade **tidak** dipakai sebagai
+frontend — SPA React tetap dikirim oleh Vite/Nginx.
 
 ## Struktur repositori
 
 ```text
 sedek_aget/
-├── frontend/                 # React + Vite
+├── frontend/                 # React + Vite (.jsx)
 │   └── src/
 │       ├── assets/styles/    # design token & CSS
 │       ├── components/       # layout & komponen UI reusable
@@ -54,15 +59,24 @@ sedek_aget/
 │       ├── pages/            # Home, Explore, Map, Login, Register, 404
 │       ├── routes/           # AppRoutes
 │       └── services/         # api, authService, storeService
-├── backend/                  # Express + Prisma
-│   ├── prisma/               # schema & seed
-│   └── src/
-│       ├── config/           # env & Prisma client
-│       ├── middleware/       # auth, validasi, error handler
-│       ├── modules/          # auth, stores, categories
-│       └── utils/
+├── backend/                  # Laravel 13 + PHP
+│   ├── app/
+│   │   ├── Contracts/        # antarmuka layanan AI (swappable)
+│   │   ├── Http/             # Controllers/Api, Requests, Resources
+│   │   ├── Jobs/             # ProcessAiVerification (mock/fallback)
+│   │   ├── Models/           # 6 model Eloquent
+│   │   ├── Policies/         # StorePolicy
+│   │   ├── Services/         # Auth, Store, Category, Mock AI
+│   │   └── Support/          # ApiResponse (envelope JSON)
+│   ├── bootstrap/app.php     # routing, middleware, exception handler
+│   ├── config/               # app, cors, database, sanctum, queue, services
+│   ├── database/
+│   │   ├── migrations/       # 6 tabel domain + cache/jobs/token
+│   │   └── seeders/          # kategori, user, toko & produk
+│   ├── routes/api.php        # 8 endpoint publik/auth
+│   └── tests/Feature/        # health, auth, stores, categories
 ├── konteks/                  # dokumen acuan proyek
-├── .github/workflows/        # CI lint + build
+├── .github/workflows/        # CI lint + test + build
 ├── docker-compose.yml        # MySQL 8.4 + Redis (development)
 ├── AGENTS.md                 # instruksi wajib untuk agen AI
 └── README.md
@@ -70,10 +84,10 @@ sedek_aget/
 
 ## Prasyarat
 
+- PHP 8.3 atau lebih baru + Composer 2 (ekstensi `pdo_mysql`, `mbstring`)
 - Node.js 20 atau lebih baru
 - MySQL 8.4 (atau jalankan lewat Docker Compose)
-- Docker + Docker Compose (opsional, untuk database & Redis lokal)
-- Redis (opsional untuk base web; dibutuhkan saat background job ditambahkan)
+- Redis (dibutuhkan queue worker; opsional untuk endpoint saat ini)
 - Google Maps API key dengan **Maps JavaScript API** aktif (untuk fitur peta)
 
 ## Menjalankan proyek
@@ -91,27 +105,38 @@ Jika memakai MySQL lokal, buat database berikut:
 
 ```sql
 CREATE DATABASE sedek_aget;
+CREATE DATABASE sedek_aget_test;
 ```
 
 ### 2. Backend
 
 ```bash
 cd backend
-npm install
 cp .env.example .env
-# sesuaikan DATABASE_URL, JWT_SECRET, dan CLIENT_URL pada .env
-npx prisma migrate dev --name init
-npm run prisma:seed
-npm run dev
+composer install
+php artisan key:generate
+php artisan migrate
+php artisan db:seed
+php artisan serve --port=5000
 ```
 
-prankkk
-
-API berjalan di `http://localhost:5000`. Cek kesehatan:
+`VITE_API_URL` lama (`http://localhost:5000/api`) tetap dipakai, jadi frontend
+tidak perlu diubah port-nya. Cek kesehatan:
 
 ```bash
 curl http://localhost:5000/api/health
 ```
+
+Jalankan worker antrean (untuk fondasi job AI) di terminal terpisah:
+
+```bash
+cd backend
+php artisan queue:work redis
+```
+
+> Kredensial Midtrans dan AI API **tidak** disimpan di repositori. Isi
+> `MIDTRANS_SERVER_KEY`, `MIDTRANS_IS_PRODUCTION`, `AI_API_KEY`, dan `AI_API_URL`
+> manual di `backend/.env` hanya di lingkungan lokal/produksi.
 
 ### 3. Frontend
 
@@ -123,8 +148,10 @@ cp .env.example .env
 npm run dev
 ```
 
-Frontend berjalan di `http://localhost:5173`. Batasi API key dengan HTTP
-referrer `http://localhost:5173/*` (dan domain produksi nanti) agar aman.
+Frontend berjalan di `http://localhost:5173`. `VITE_APP_URL` dipakai untuk
+mengambil cookie CSRF Sanctum di `${VITE_APP_URL}/sanctum/csrf-cookie`;
+default-nya diturunkan dari `VITE_API_URL`. Batasi API key Google Maps dengan
+HTTP referrer `http://localhost:5173/*` (dan domain produksi nanti).
 
 ## Akun demo (hasil seed)
 
@@ -135,31 +162,36 @@ referrer `http://localhost:5173/*` (dan domain produksi nanti) agar aman.
 
 ## Endpoint API
 
-| Method | Endpoint              | Keterangan                     |
-| ------ | --------------------- | ------------------------------ |
-| GET    | `/api/health`         | Status API                     |
-| POST   | `/api/auth/register`  | Registrasi akun                |
-| POST   | `/api/auth/login`     | Login (set cookie HttpOnly)    |
-| POST   | `/api/auth/logout`    | Logout                         |
-| GET    | `/api/auth/me`        | Profil pengguna aktif          |
-| GET    | `/api/stores`         | Daftar UMKM aktif              |
-| GET    | `/api/stores/:slug`   | Detail UMKM                    |
-| GET    | `/api/categories`     | Daftar kategori usaha          |
+| Method | Endpoint              | Keterangan                          | Auth |
+| ------ | --------------------- | ----------------------------------- | ---- |
+| GET    | `/api/health`         | Status API                          | —    |
+| POST   | `/api/auth/register`  | Registrasi akun                     | —    |
+| POST   | `/api/auth/login`     | Login (set session cookie HttpOnly) | —    |
+| POST   | `/api/auth/logout`    | Logout                              | Ya   |
+| GET    | `/api/auth/me`        | Profil pengguna aktif               | Ya   |
+| GET    | `/api/stores`         | Daftar UMKM aktif                   | —    |
+| GET    | `/api/stores/:slug`   | Detail UMKM                         | —    |
+| GET    | `/api/categories`     | Daftar kategori usaha               | —    |
 
 Query opsional untuk `/api/stores`: `?search=` dan `?category=`.
 
+Respons sukses dibungkus `{ "success": true, "data": ... }`; error
+`{ "success": false, "message": "...", "details": [{ "path", "message" }] }`.
+
 ## Scripts
 
-| Lokasi    | Perintah                 | Fungsi                          |
-| --------- | ------------------------ | ------------------------------- |
-| frontend  | `npm run dev`            | Jalankan Vite dev server        |
-| frontend  | `npm run build`          | Build produksi                  |
-| frontend  | `npm run lint`           | ESLint frontend                 |
-| backend   | `npm run dev`            | Jalankan API (watch mode)       |
-| backend   | `npm start`              | Jalankan API produksi           |
-| backend   | `npm run lint`           | ESLint backend                  |
-| backend   | `npm run prisma:migrate` | Prisma migrate (development)    |
-| backend   | `npm run prisma:seed`    | Isi data contoh                 |
+| Lokasi    | Perintah                     | Fungsi                              |
+| --------- | ---------------------------- | ----------------------------------- |
+| frontend  | `npm run dev`                | Jalankan Vite dev server            |
+| frontend  | `npm run build`              | Build produksi                      |
+| frontend  | `npm run lint`               | ESLint frontend                     |
+| backend   | `composer lint`              | Pint `--test` (PHP style)           |
+| backend   | `composer format`            | Pint (format otomatis)              |
+| backend   | `php artisan route:list`     | Daftar route API                    |
+| backend   | `php artisan migrate`        | Jalankan migrasi (non-destruktif)   |
+| backend   | `php artisan db:seed`        | Isi data contoh (`updateOrCreate`)  |
+| backend   | `php artisan test`           | PHPUnit feature tests               |
+| backend   | `php artisan queue:work redis` | Jalankan worker antrean           |
 
 ## Desain
 
@@ -180,6 +212,23 @@ Query opsional untuk `/api/stores`: `?search=` dan `?category=`.
   struktur & konvensi kode.
 
 ## Catatan perubahan
+
+### 19 November 2026
+
+- Migrasi backend Express.js/Prisma → **Laravel 13 + Eloquent** untuk
+  kepatuhan stack lomba. Kontrak API 8 endpoint, envelope JSON, dan port 5000
+  dipertahankan agar frontend tidak di-redesign.
+- Autentikasi JWT cookie diganti **Sanctum SPA cookie**; frontend menambah
+  bootstrap CSRF di `src/services/api.js` dan `VITE_APP_URL`.
+- Migrasi database dibuat non-destruktif (`Schema::hasTable()` guard), seeder
+  memakai `updateOrCreate`; tidak ada `migrate:fresh`/truncate.
+- Fondasi queue Redis (`predis/predis`), job `ProcessAiVerification` dengan
+  mock AI, dan konfigurasi Midtrans tanpa secret. Webhook Midtrans dan pipeline
+  AI nyata **belum** diimplementasikan.
+- CI diperbarui: backend PHP 8.4 + Composer + Pint + PHPUnit (MySQL service),
+  frontend ESLint + build, serta pemeriksaan duplikasi JSCPD < 50%.
+- Dokumentasi stack (`README.md`, `AGENTS.md`, seluruh `konteks/`) disinkronkan;
+  baris sampah `prankkk` dihapus.
 
 ### 12 November 2026
 

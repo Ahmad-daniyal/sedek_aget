@@ -29,7 +29,7 @@ Baca berurutan, jangan dilewati:
 | 1      | `konteks/README.md`          | Gambaran proyek, fitur utama, tech stack, cara menjalankan.          |
 | 2      | `konteks/konsep.md`          | Konsep bisnis, arsitektur, database, AI verification, roadmap 9 tahap. |
 | 3      | `konteks/rules.md`           | Aturan lomba, stack final, standar clean code, keamanan, larangan.   |
-| 4      | `konteks/STRUKTUR_CODE.md`   | Referensi struktur & konvensi kode (adaptasi ke React + Express).    |
+| 4      | `konteks/STRUKTUR_CODE.md`   | Referensi struktur & konvensi kode (adaptasi ke React + Laravel).    |
 
 Jika ada file baru di `konteks/`, baca juga sebelum bekerja.
 
@@ -42,13 +42,19 @@ tim:
 
 - **Frontend:** React.js + Vite, JavaScript/JSX (`.jsx`), Bootstrap 5.3 +
   Custom CSS, Bootstrap Icons, AOS.
-- **Backend:** Node.js + Express.js, JavaScript (`.js`).
-- **Database:** MySQL 8.4 + Prisma ORM (nama database: `sedek_aget`).
-- **Background job:** Redis + BullMQ.
+- **Backend:** Laravel 13 + PHP 8.3+ (REST API, bukan Express/Node.js).
+- **Database:** MySQL 8.4 + Eloquent ORM (nama database: `sedek_aget`).
+- **Autentikasi:** Laravel Sanctum SPA cookie + CSRF.
+- **Background job:** Laravel Queue + Redis (`predis/predis`).
 - **Integrasi:** Midtrans Snap, Google Maps JavaScript API, Chart.js.
 - **Deployment:** Docker + Nginx.
-- **Dilarang:** TypeScript, Next.js, Laravel, Blade, Tailwind CSS.
+- **Dilarang:** Express.js, Node.js sebagai backend, TypeScript, Next.js, Vue,
+  Nuxt, CodeIgniter, Tailwind CSS. Blade tidak dipakai sebagai frontend.
 - Penamaan teknis konsisten memakai `sedek_aget` (repo, folder root, database).
+
+> PERUBAHAN 19 November 2026: aturan lama yang melarang Laravel dan menetapkan
+> Express/Prisma/BullMQ sudah diganti. Semua dokumen `konteks/` mengikuti
+> stack Laravel di atas.
 
 ---
 

@@ -1,8 +1,12 @@
-# Struktur Code — Edquest
+# Struktur Code — Edquest (dokumen referensi)
 
-> Dokumen referensi arsitektur dan konvensi kode proyek **Edquest**.
-> Dipakai sebagai acuan untuk proyek lain bertema *clean code* — termasuk proyek
-> yang memakai framework. Bahasa: Indonesia. Gaya: referensi lengkap & praktis.
+> **Catatan penting (19 November 2026):** dokumen ini adalah referensi
+> arsitektur/konvensi dari proyek **Edquest** (SPA statis, Tailwind CDN, tanpa
+> backend). Ia **bukan** struktur final `sedek_aget`. Struktur aktual proyek:
+> frontend React + Vite + Bootstrap 5.3 di `frontend/src/`, backend
+> **Laravel 13 + Eloquent** di `backend/app/`, `backend/routes/api.php`, dan
+> `backend/database/`. Prinsip layered-nya tetap dipakai; pilihan teknologi
+> di dalam contoh tidak.
 
 ---
 
@@ -15,7 +19,7 @@ Proyek ini sengaja dibangun tanpa framework JavaScript agar sesuai aturan lomba
 | Aspek | Keputusan | Konsekuensi struktur |
 |---|---|---|
 | Bahasa | JavaScript modern (ES Modules native) | Semua modul `import`/`export`, tanpa bundler |
-| UI | HTML string + Tailwind CDN + CSS variables | View = fungsi yang mengembalikan string HTML |
+| UI | HTML string + CSS variables (contoh Edquest) | View = fungsi yang mengembalikan string HTML |
 | Routing | Hash routing (`#/`, `#/forum`, dst.) | Tidak butuh server rewrite; aman di static hosting |
 | Data | JSON statis di-fetch sekali ke `dataStore` | Data layer terpisah dari view dan logika |
 | State user | `localStorage` / `sessionStorage` | Persistensi browser, tanpa backend |
@@ -513,7 +517,7 @@ Struktur ini bisa dipetakan langsung ke framework apa pun. Inti yang dipertahank
 | `components/layout` | Layout components (`AppLayout`, `Navbar`, `Sidebar`) |
 | `components/ui` | Shared UI components (`Modal`, `Button`, `Input`) |
 | `features/*` | Pages/routes/views |
-| `css/global.css` token | Theme config (Tailwind `theme.extend`, CSS variables, design tokens) |
+| `css/global.css` token | CSS variables / design token (di `sedek_aget`: Bootstrap 5.3 + custom CSS) |
 | Event `pageChanged` | Router hooks / `afterEach` / route watcher |
 
 ### 8.2 Usulan struktur folder versi framework
@@ -685,6 +689,27 @@ sumber kebenaran.
 7. Tambahkan link navigasi di `components/layout/navbar|sidebar|footer`.
 8. Tambahkan entri `PAGE_ENTRIES` di `js/core/search.js` agar bisa dicari.
 9. Uji: navigasi langsung, refresh halaman, dark mode, mobile, reduced motion.
+
+---
+
+## 13. Pemetaan komponen Express → Laravel (sedek_aget)
+
+| Komponen lama (Express) | Padanan Laravel aktual |
+| ----------------------- | ---------------------- |
+| `src/app.js`, `src/server.js` | `bootstrap/app.php`, `routes/api.php`, `public/index.php` |
+| JWT cookie `jsonwebtoken` | Sanctum SPA cookie (`auth:sanctum`, CSRF) |
+| `requireAuth`, `requireRole` | `auth.api:sanctum` (`app/Http/Middleware/AuthenticateApi.php`) + `app/Policies/StorePolicy.php` |
+| Zod schema | `app/Http/Requests/{RegisterRequest,LoginRequest}.php` |
+| `AppError` + `errorHandler` | Exception handler di `bootstrap/app.php` + `app/Support/ApiResponse.php` |
+| `modules/*/service.js` | `app/Services/*Service.php` |
+| `modules/*/controller.js` | `app/Http/Controllers/Api/*Controller.php` |
+| Response mapping Prisma | `app/Http/Resources/*Resource.php` |
+| `prisma/schema.prisma` | `database/migrations/*.php` + `app/Models/*.php` |
+| `prisma/seed.js` | `database/seeders/*.php` (`updateOrCreate`) |
+| BullMQ (belum ada kode) | `config/queue.php` + `app/Jobs/ProcessAiVerification.php` |
+
+Envelop JSON lama `{ success, data }` / `{ success, message, details }`
+dipertahankan agar `frontend/src/services/api.js` tidak perlu mengubah kontrak.
 
 ---
 

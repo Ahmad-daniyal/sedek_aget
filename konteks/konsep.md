@@ -68,18 +68,20 @@ Berikut teknologi yang sudah disepakati sebagai stack utama proyek.
 
 ### Backend
 
-- **Node.js + Express.js** — REST API dan seluruh proses bisnis menggunakan
-  JavaScript.
+- **Laravel 13 + PHP 8.3+** — REST API, validasi, otorisasi, dan seluruh proses
+  bisnis.
+- **Laravel Sanctum** — autentikasi SPA memakai cookie `HttpOnly` + CSRF.
 
 ### Database dan pengelolaan data
 
 - **MySQL 8.4** — database utama.
-- **Prisma ORM** — penghubung backend dengan database.
+- **Eloquent ORM** — penghubung backend dengan database; nama tabel/kolom
+  hasil migrasi Prisma dipertahankan apa adanya (camelCase).
 
 ### Background processing
 
-- **Redis + BullMQ** — antrean pekerjaan AI, notifikasi, dan proses berat di
-   belakang layar.
+- **Laravel Queue + Redis** (`predis/predis`) — antrean pekerjaan AI,
+  notifikasi, dan proses berat di belakang layar.
 
 ### Integrasi eksternal
 
@@ -97,9 +99,14 @@ Berikut teknologi yang sudah disepakati sebagai stack utama proyek.
 
 ### Aturan teknologi
 
-Frontend React + JavaScript `.jsx`, backend Express + JavaScript `.js`.
-**Tidak menggunakan** TypeScript, Next.js, Laravel, Blade, maupun
-Tailwind CSS.
+Frontend React + JavaScript `.jsx`, backend Laravel + PHP `.php`.
+**Tidak menggunakan** Express.js, Node.js sebagai backend, TypeScript,
+Next.js, Vue, Nuxt, CodeIgniter, maupun Tailwind CSS. Blade tidak dipakai
+sebagai frontend.
+
+> Pembaruan 19 November 2026: keputusan sebelumnya (Express/Prisma/BullMQ dan
+> larangan Laravel) dicabut. Alasan migrasi dan dampaknya tercatat di
+> `README.md` root dan `konteks/README.md`.
 
 ## 4. Konsep utama platform
 
@@ -333,7 +340,7 @@ Untuk pembayaran langsung, penjual perlu melakukan konfirmasi pembayaran.
 Alur teknis:
 
 1. Pembeli melakukan checkout.
-2. Backend Express menghitung total pembayaran.
+2. Backend Laravel menghitung total pembayaran (harga tidak dipercaya dari frontend).
 3. Backend membuat transaksi dan meminta Snap Token ke Midtrans.
 4. Frontend menampilkan halaman atau popup pembayaran.
 5. Pembeli melakukan pembayaran.
@@ -553,9 +560,9 @@ membebani server API.
 
 ```mermaid
 flowchart TD
-    A[Pemilik mendaftarkan usaha] --> B[Express API membuat kasus]
+    A[Pemilik mendaftarkan usaha] --> B[Laravel API membuat kasus]
     B --> C[Simpan bukti dan data usaha]
-    C --> D[Redis + BullMQ: AI Verification Worker]
+    C --> D[Laravel Queue + Redis: AI Verification Worker]
     D --> E[OCR dan pemeriksaan dokumen]
     D --> F[Vision AI dan foto usaha]
     D --> G[GPS dan lokasi]
@@ -579,9 +586,9 @@ flowchart TD
 Tahapan implementasi:
 
 1. Seller mengirim pengajuan.
-2. Express membuat kasus verifikasi.
+2. Laravel membuat kasus verifikasi.
 3. Bukti disimpan secara aman.
-4. BullMQ menjalankan pekerjaan AI.
+4. Laravel Queue menjalankan pekerjaan AI.
 5. Setiap tahapan pemeriksaan disimpan.
 6. Dashboard menampilkan progres.
 7. Sistem meminta bukti tambahan jika perlu.
@@ -613,9 +620,13 @@ tingkat ketepatannya terukur.
 
 Database utama bernama `sedek_aget`.
 
-Kita menggunakan MySQL 8.4 dengan Prisma ORM.
+Kita menggunakan MySQL 8.4 dengan Eloquent ORM. Enam tabel yang sudah
+diimplementasikan (hasil migrasi dari schema Prisma lama) adalah `users`,
+`business_categories`, `stores`, `store_locations`,
+`store_business_categories`, dan `products`. Nama kolom camelCase dipertahankan
+apa adanya agar tidak merusak data yang sudah ada.
 
-Berikut kelompok tabel yang direncanakan.
+Berikut kelompok tabel yang direncanakan (sebagian belum diimplementasikan).
 
 ### A. Identitas dan pengelolaan UMKM
 
@@ -706,7 +717,7 @@ biaya operasional, biaya transaksi, pajak, dan refund.
 
 Struktur ini masih merupakan rancangan konseptual. Detail kolom, tipe data,
 indeks, foreign key, dan aturan relasi akan ditetapkan saat perancangan ERD
-dan Prisma Schema.
+dan migrasi Eloquent. **Belum** dibuat saat ini.
 
 ## 13. Dashboard dan menu setiap pengguna
 
@@ -837,30 +848,27 @@ sedek_aget/
 │   │   └── main.jsx
 │   └── package.json
 │
-├── backend/
-│   ├── prisma/
-│   │   └── schema.prisma
-│   ├── src/
-│   │   ├── config/
-│   │   ├── middleware/
-│   │   ├── modules/
-│   │   │   ├── auth/
-│   │   │   ├── users/
-│   │   │   ├── stores/
-│   │   │   ├── products/
-│   │   │   ├── services/
-│   │   │   ├── orders/
-│   │   │   ├── bookings/
-│   │   │   ├── payments/
-│   │   │   ├── reports/
-│   │   │   └── ai-verification/
-│   │   ├── queues/
-│   │   ├── jobs/
-│   │   ├── utils/
-│   │   ├── app.js
-│   │   └── server.js
-│   ├── .env
-│   └── package.json
+├── backend/                    # Laravel 13 + PHP
+│   ├── app/
+│   │   ├── Contracts/          # antarmuka layanan AI (swappable)
+│   │   ├── Http/
+│   │   │   ├── Controllers/Api/
+│   │   │   ├── Requests/
+│   │   │   └── Resources/
+│   │   ├── Jobs/               # ProcessAiVerification (mock/fallback)
+│   │   ├── Models/
+│   │   ├── Policies/
+│   │   ├── Services/
+│   │   └── Support/
+│   ├── bootstrap/app.php
+│   ├── config/                 # cors, sanctum, queue, services, dll.
+│   ├── database/
+│   │   ├── migrations/
+│   │   └── seeders/
+│   ├── routes/api.php
+│   ├── tests/Feature/
+│   ├── artisan
+│   └── composer.json
 │
 ├── konteks/
 │   ├── README.md
@@ -883,8 +891,9 @@ mencampurkan kode frontend dan backend.
 Beberapa aturan teknis dan bisnis perlu menjadi prinsip tetap:
 
 1. Password pengguna harus di-hash.
-2. Autentikasi menggunakan mekanisme session atau JWT dengan cookie
-   `HttpOnly` yang aman.
+2. Autentikasi memakai Laravel Sanctum SPA cookie (`HttpOnly`) + CSRF.
+   Request API yang belum login wajib mendapatkan `{ success:false, message }`
+   dengan status 401, bukan redirect ke halaman login web.
 3. Hak akses harus diperiksa di backend, bukan hanya menyembunyikan menu
    frontend.
 4. Server Key Midtrans tidak boleh dikirim ke browser.
@@ -913,9 +922,9 @@ bertahap agar setiap bagian dapat diuji sebelum melanjutkan.
    - Menyusun ERD.
 2. **Tahap 2 — Persiapan lingkungan**
    - Membuat proyek React + Vite.
-   - Membuat backend Express.
+   - Membuat backend Laravel.
    - Instalasi Bootstrap, Bootstrap Icons, AOS, dan React Router.
-   - Konfigurasi MySQL dan Prisma.
+   - Konfigurasi MySQL dan Eloquent.
    - Konfigurasi Git dan environment.
 3. **Tahap 3 — Autentikasi dan pengguna**
    - Registrasi.
@@ -997,9 +1006,9 @@ tanpa alasan.
 | MVP checkout         | Satu toko per checkout                        |
 | Peta                 | Google Maps JavaScript API                       |
 | Frontend             | React + Vite + JavaScript                     |
-| Backend              | Node.js + Express + JavaScript                |
-| Database             | MySQL 8.4 + Prisma                            |
-| Background job       | Redis + BullMQ                                |
+| Backend              | Laravel 13 + PHP                              |
+| Database             | MySQL 8.4 + Eloquent                          |
+| Background job       | Laravel Queue + Redis                         |
 | UI                   | Google Stitch, Bootstrap 5.3                  |
 | Deployment           | Docker + Nginx                                |
 
@@ -1018,8 +1027,8 @@ laporan.
 **AI-Powered UMKM Verification** memeriksa bukti usaha, foto, lokasi,
 konsistensi data, dan indikasi risiko untuk menjaga kepercayaan ekosistem.
 
-Infrastruktur teknologi: React, Express, MySQL, Prisma, Redis, BullMQ,
-Midtrans, Docker.
+Infrastruktur teknologi: React, Laravel, MySQL, Eloquent, Redis, Midtrans,
+Docker.
 
 ## 20. Arah pengembangan selanjutnya
 

@@ -30,16 +30,18 @@ layanan. Pendaftaran usaha diverifikasi secara inklusif berbasis bukti
 | -------------- | ------------------------------------------------------- |
 | Frontend       | React.js + Vite (JavaScript `.jsx`)                     |
 | UI             | Bootstrap 5.3 + Custom CSS, Bootstrap Icons, AOS        |
-| Backend        | Node.js + Express.js (JavaScript `.js`)                |
-| Database       | MySQL 8.4 + Prisma ORM                                  |
-| Background job | Redis + BullMQ                                          |
+| Backend        | Laravel 13 + PHP 8.3+ (REST API)                        |
+| Database       | MySQL 8.4 + Eloquent ORM                                |
+| Autentikasi    | Laravel Sanctum — SPA cookie + CSRF                     |
+| Background job | Laravel Queue + Redis (`predis/predis`)                 |
 | Pembayaran     | Midtrans Snap                                           |
-| Peta           | Google Maps JavaScript API                                 |
+| Peta           | Google Maps JavaScript API                              |
 | Grafik         | Chart.js                                                |
-| Deployment     | Docker + Nginx                                         |
+| Deployment     | Docker + Nginx                                          |
 
-Aturan proyek: **tidak menggunakan** TypeScript, Next.js, Laravel, Blade,
-maupun Tailwind CSS. Selengkapnya di [rules.md](./rules.md).
+Aturan proyek: **tidak menggunakan** Express.js, Node.js sebagai backend,
+TypeScript, Next.js, Vue, Nuxt, CodeIgniter, maupun Tailwind CSS. Blade tidak
+dipakai sebagai frontend. Selengkapnya di [rules.md](./rules.md).
 
 ## Struktur Proyek
 
@@ -49,7 +51,7 @@ Struktur monorepo (detail lengkap di
 ```
 sedek_aget/
 ├── frontend/            # React + Vite (.jsx)
-├── backend/             # Express + Prisma (.js)
+├── backend/             # Laravel 13 + PHP (Eloquent)
 ├── konteks/             # Dokumen acuan proyek & aturan AI
 │   ├── README.md
 │   ├── konsep.md
@@ -63,27 +65,35 @@ sedek_aget/
 
 ## Cara Menjalankan Proyek
 
-Prasyarat: [Node.js](https://nodejs.org/) LTS, MySQL 8.4, dan Redis.
+Prasyarat: PHP 8.3+ & Composer 2, [Node.js](https://nodejs.org/) LTS,
+MySQL 8.4, dan Redis.
 
 ```bash
 # 1. Clone repositori
 git clone <URL-REPO-TIM>
 cd sedek_aget
 
-# 2. Frontend
+# 2. Database & Redis
+docker compose up -d mysql redis
+
+# 3. Backend (terminal pertama)
+cd backend
+cp .env.example .env    # isi kredensial: database, Redis, Midtrans, API AI
+composer install
+php artisan key:generate
+php artisan migrate
+php artisan db:seed
+php artisan serve --port=5000
+
+# 4. Frontend (terminal kedua)
 cd frontend
 npm install
-npm run dev
-
-# 3. Backend (terminal terpisah)
-cd backend
-npm install
-cp .env.example .env    # isi kredensial: database, Redis, Midtrans, API AI
+cp .env.example .env
 npm run dev
 ```
 
-> Gunakan `docker compose up -d mysql redis` untuk menjalankan database dan
-> Redis development. Detail lengkap ada di `README.md` root.
+> Worker antrean: `php artisan queue:work redis` dari folder `backend`.
+> Detail lengkap ada di `README.md` root.
 
 ## Dokumentasi
 
@@ -93,6 +103,18 @@ npm run dev
 - `Guidebook_CleanCode_informindfest.pdf` — panduan resmi lomba.
 
 ## Catatan Perubahan
+
+### 19 November 2026
+
+- Migrasi backend dari Express.js/Prisma/BullMQ ke **Laravel 13 + Eloquent +
+  Laravel Queue (Redis)**. Alasan: kepatuhan stack lomba dan dukungan penuh
+  ekosistem Laravel untuk otorisasi, migrasi, dan antrean.
+- Aturan lama yang melarang Laravel dicabut di `rules.md`, `konsep.md`,
+  `STRUKTUR_CODE.md`, `AGENTS.md`, dan `README.md` root.
+- Kontrak 8 endpoint API dipertahankan persis; autentikasi kini Sanctum SPA
+  cookie dengan bootstrap CSRF di frontend.
+- Database hanya memigrasi 6 model yang benar-benar ada (bukan ~40 tabel
+  konseptual); integrasi Midtrans/AI tetap berupa konfigurasi + mock.
 
 ### 12 November 2026
 
@@ -113,10 +135,10 @@ npm run dev
   UMKM (arsitektur, fitur, proses bisnis, database, sistem verifikasi AI,
   roadmap, dan batasan MVP untuk lomba), dengan penamaan diseragamkan ke
   `sedek_aget` (nama produk final menyusul).
-- Memperbarui `rules.md` — menambahkan stack final proyek (React+Vite,
-  Bootstrap 5.3, Express, MySQL+Prisma, Redis+BullMQ, Midtrans, Leaflet,
-  Chart.js, Docker+Nginx) beserta larangan teknologi (TypeScript, Next.js,
-  Laravel, Blade, Tailwind), aturan anti-duplikasi CRUD, integrasi &
+- Memperbarui `rules.md` — menambahkan stack final proyek (saat itu
+  React+Vite, Bootstrap 5.3, Express, MySQL+Prisma, Redis+BullMQ, Midtrans,
+  Leaflet, Chart.js, Docker+Nginx) beserta larangan teknologi, aturan
+  anti-duplikasi CRUD, integrasi &
   keamanan proyek, prioritas MVP & kesiapan demo, serta checklist yang
   diperluas.
 - Memperbarui `README.md` — mendeklarasikan subtema **EKRAF**, deskripsi

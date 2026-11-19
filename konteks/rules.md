@@ -23,9 +23,11 @@ Semua kontributor wajib membaca dan mematuhi dokumen ini sebelum menulis kode.
 
 ## 2. Spesifikasi Teknis Wajib Lomba
 
-1. Stack teknologi (bebas, direkomendasikan): Vanilla HTML/CSS/JS, React.js,
-   Next.js, Vue.js, atau TypeScript.
-2. CSS framework yang diperbolehkan: Tailwind CSS atau Bootstrap.
+1. Stack teknologi bebas; panitia merekomendasikan Vanilla HTML/CSS/JS,
+   React.js, Next.js, Vue.js, atau TypeScript. Keputusan internal proyek
+   `sedek_aget` mengikuti bagian 3 di bawah (React + Laravel).
+2. CSS framework yang diperbolehkan: Tailwind CSS atau Bootstrap. Proyek ini
+   memakai Bootstrap 5.3 + custom CSS.
 3. Kode harus lolos penyaringan otomatis (System Automated):
    - **CI/CD GitHub Actions Build Check** — build harus sukses.
    - **Linter ESLint** — tanpa error/warning yang diabaikan.
@@ -40,9 +42,10 @@ Keputusan stack proyek (selaras ketentuan lomba — lihat
 | --------------- | ------------------------------------------------------------ |
 | Frontend        | React.js + Vite — JavaScript/JSX (`.jsx`)                      |
 | UI              | Bootstrap 5.3 + Custom CSS, Bootstrap Icons, AOS               |
-| Backend         | Node.js + Express.js — JavaScript (`.js`)                     |
-| Database        | MySQL 8.4 + Prisma ORM (database: `sedek_aget`)               |
-| Background job  | Redis + BullMQ                                                |
+| Backend         | Laravel 13 + PHP 8.3+ (REST API)                              |
+| Database        | MySQL 8.4 + Eloquent ORM (database: `sedek_aget`)             |
+| Autentikasi     | Laravel Sanctum — SPA cookie + CSRF                           |
+| Background job  | Laravel Queue + Redis (`predis/predis`)                       |
 | Pembayaran      | Midtrans Snap                                                 |
 | Peta            | Google Maps JavaScript API                                    |
 | Grafik          | Chart.js                                                     |
@@ -50,9 +53,10 @@ Keputusan stack proyek (selaras ketentuan lomba — lihat
 
 Aturan tambahan:
 
-1. **Dilarang** menggunakan TypeScript, Next.js, Laravel, Blade, maupun
-   Tailwind CSS.
-2. Ekstensi file frontend `.jsx`, backend `.js` — konsisten di seluruh proyek.
+1. **Dilarang** menggunakan Express.js, Node.js sebagai backend, TypeScript,
+   Next.js, Vue, Nuxt, CodeIgniter, maupun Tailwind CSS. Blade tidak dipakai
+   sebagai frontend (SPA tetap React).
+2. Ekstensi file frontend `.jsx`, backend `.php` — konsisten di seluruh proyek.
 3. Penamaan teknis konsisten memakai `sedek_aget` (repo, folder root,
    database) sampai nama produk final ditetapkan.
 4. Perubahan stack hanya boleh dilakukan lewat kesepakatan tim dan dicatat di
@@ -62,8 +66,9 @@ Aturan tambahan:
 
 1. **Kerapihan struktur folder**
    - Ikuti struktur monorepo di `konteks/konsep.md` (bagian 15): `frontend/` dan
-     `backend/` terpisah, modul backend per domain (`modules/auth`,
-     `modules/stores`, dst.).
+     `backend/` terpisah, backend Laravel layered (`Http/Controllers/Api`,
+     `Http/Requests`, `Http/Resources`, `Services`, `Models`, `Policies`,
+     `Jobs`).
    - Konsisten di seluruh proyek; jangan mencampur kode frontend dan backend.
 2. **Keterbacaan kode**
    - Penamaan variabel, fungsi, dan file harus deskriptif dan konsisten
@@ -85,9 +90,9 @@ Aturan tambahan:
 5. **Kepatuhan linter**
    - Dilarang memanipulasi file konfigurasi linter atau memakai
      `// eslint-disable` secara agresif untuk mengelabui auto-grading.
-   - Perbaiki akar masalah yang dilaporkan ESLint, jangan sembunyikan.
+   - Perbaiki akar masalah yang dilaporkan ESLint/Pint, jangan sembunyikan.
 6. **CI wajib hijau**
-   - `.github/workflows` menjalankan **lint + build**; push/PR terakhir harus
+   - `.github/workflows` menjalankan **ESLint + build frontend, Pint + PHPUnit backend, dan JSCPD < 50%**; push/PR terakhir harus
      status hijau sebelum submit (syarat System Automated Tahap 2).
 7. **Dokumentasi**
    - `README.md` harus selalu mutakhir: cara install, menjalankan, dan
@@ -179,7 +184,7 @@ Nilai Akhir = (20% x Nilai Tahap 1: Abstrak Ide)
 - [ ] Repositori GitHub publik dan up-to-date.
 - [ ] `README.md` berisi deskripsi, cara menjalankan, dan tech stack.
 - [ ] Build CI/CD GitHub Actions sukses (lint + build hijau).
-- [ ] Linter ESLint lolos tanpa error di frontend dan backend.
+- [ ] ESLint lolos di frontend dan Pint (`composer lint`) lolos di backend.
 - [ ] Skor JSCPD < 50%.
 - [ ] Tidak ada dead code dan duplikasi berlebihan.
 - [ ] Tidak ada `eslint-disable` agresif.

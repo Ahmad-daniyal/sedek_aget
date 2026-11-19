@@ -7,21 +7,38 @@ on:
 
 jobs:
   backend:
-    name: Backend lint
+    name: Backend Laravel (lint & test)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: sedek_aget_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h127.0.0.1 -uroot -ppassword"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: shivammathur/setup-php@v2
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: backend/package-lock.json
-      - run: npm ci
-      - run: npx prisma generate
-      - run: npm run lint
+          php-version: '8.4'
+          extensions: pdo_mysql, mbstring, dom, curl, zip
+          coverage: none
+          tools: composer:v2
+      - run: composer validate --no-check-publish
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: cp .env.example .env && php artisan key:generate --ansi
+      - run: php artisan route:list
+      - run: composer lint
+      - run: php artisan test
 
   frontend:
     name: Frontend lint & build
@@ -39,3 +56,13 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+
+  duplication:
+    name: JSCPD duplication check (< 50%)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npx --yes jscpd@4 frontend/src --threshold 50 --reporters console

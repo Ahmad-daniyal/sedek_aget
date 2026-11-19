@@ -13,4 +13,10 @@ coverage/
 .idea/
 
 frontend/.vite/
-backend/src/generated/
+backend/vendor/
+backend/.phpunit.cache/
+backend/bootstrap/cache/*.php
+backend/storage/framework/cache/data/
+backend/storage/framework/sessions/
+backend/storage/framework/views/
+backend/storage/*.key
